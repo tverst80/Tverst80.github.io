@@ -5,78 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tverst80 — Links</title>
 <style>
-    :root{
-      --blue: 0,0,255;   /* чистый синий */
-      --red: 255,0,0;    /* чистый красный */
-    }
-
-    *{box-sizing:border-box}
     body {
         margin: 0;
         height: 100vh;
         display: flex;
         font-family: Arial, sans-serif;
-        overflow: hidden;
-        position: relative;
         background: #000;
-    }
-
-    /* НЕОНОВЫЙ ОДЕРЖИМЫЙ СЛОЙ ВЫШЕ ВСЕГО */
-    body::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none; /* ссылки остаются кликабельны */
-        box-shadow: 0 0 0 transparent;
-        transition: box-shadow .28s ease;
-        z-index: 9999; /* поверх всего */
-    }
-
-    /* ЛЕВЫЙ ХОВЕР = СИНИЙ (0,0,255) */
-    body.left-hover::after {
-        box-shadow:
-          inset 30px 0 90px rgba(var(--blue), 0.98),
-          inset -10px 0 60px rgba(0,0,0,0.55),
-          0 0 140px rgba(var(--blue), 0.85);
-        animation: pulse-blue 1.6s infinite alternate;
-    }
-
-    /* ПРАВЫЙ ХОВЕР = КРАСНЫЙ (255,0,0) */
-    body.right-hover::after {
-        box-shadow:
-          inset -30px 0 90px rgba(var(--red), 0.98),
-          inset 10px 0 60px rgba(0,0,0,0.55),
-          0 0 140px rgba(var(--red), 0.85);
-        animation: pulse-red 1.6s infinite alternate;
-    }
-
-    @keyframes pulse-blue {
-      from {
-        box-shadow:
-          inset 20px 0 70px rgba(var(--blue), 0.9),
-          inset -8px 0 40px rgba(0,0,0,0.5),
-          0 0 100px rgba(var(--blue), 0.7);
-      }
-      to {
-        box-shadow:
-          inset 40px 0 120px rgba(var(--blue), 1),
-          inset -12px 0 60px rgba(0,0,0,0.6),
-          0 0 180px rgba(var(--blue), 1);
-      }
-    }
-    @keyframes pulse-red {
-      from {
-        box-shadow:
-          inset -20px 0 70px rgba(var(--red), 0.9),
-          inset 8px 0 40px rgba(0,0,0,0.5),
-          0 0 100px rgba(var(--red), 0.7);
-      }
-      to {
-        box-shadow:
-          inset -40px 0 120px rgba(var(--red), 1),
-          inset 12px 0 60px rgba(0,0,0,0.6),
-          0 0 180px rgba(var(--red), 1);
-      }
     }
 
     .side {
@@ -85,103 +19,102 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-size: cover;
-        background-position: center;
-        color: white;
+        transition: flex 0.5s ease, filter 0.5s ease;
         position: relative;
-        transition: flex .36s ease, filter .36s ease;
-        z-index: 1; /* под неоновым слоем */
+        overflow: hidden;
     }
 
-    .side::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8));
-        z-index: 1;
-        transition: opacity .36s ease;
+    .left {
+        background: linear-gradient(to bottom right, rgba(0,0,255,0.3), rgba(0,0,255,0.1));
     }
 
-    .side-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
+    .right {
+        background: linear-gradient(to bottom left, rgba(255,0,0,0.3), rgba(255,0,0,0.1));
     }
 
-    /* увеличение при наведении на сторону */
-    .side:hover { flex: 1.2; filter: brightness(1.05); }
-
-    .avatar {
-        width: 190px;
-        height: 190px;
+    .side img {
+        width: 160px;
+        height: 160px;
         border-radius: 50%;
-        border: 4px solid rgba(255,255,255,0.12);
-        margin-bottom: 18px;
-        transition: transform .28s ease, box-shadow .28s ease;
-        z-index: 3;
+        margin-bottom: 20px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.8);
+        transition: box-shadow 0.5s ease;
     }
 
-    /* Цветовые кайфы аватарок (видны под неоновым слоем, т.к. слой прозрачный) */
-    .left .avatar { box-shadow: 0 0 40px rgba(0,0,255,0.95); }
-    .right .avatar { box-shadow: 0 0 40px rgba(255,0,0,0.95); }
-
-    .side:hover .avatar { transform: scale(1.06); }
-
-    .link {
+    .links a {
         display: block;
-        margin: 14px 0;
-        padding: 16px 34px;
-        border-radius: 14px;
-        font-size: 20px;
+        padding: 15px 30px;
+        margin: 10px;
+        border-radius: 10px;
         text-decoration: none;
-        font-weight: 800;
-        background: rgba(255,255,255,0.06);
-        color: #fff;
-        transition: background .22s ease, box-shadow .22s ease, transform .22s ease;
-        z-index: 3;
+        color: white;
+        font-size: 1.2em;
+        text-align: center;
+        transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
     }
 
-    /* кнопки по цвету логотипа */
-    .left .link.telegram:hover  { background: rgba(0,136,204,0.45); box-shadow: 0 0 22px rgba(0,136,204,0.9); transform: translateY(-4px); }
-    .left .link.youtube:hover   { background: rgba(255,0,0,0.45);   box-shadow: 0 0 22px rgba(255,0,0,0.9);   transform: translateY(-4px); }
+    /* Цвета кнопок */
+    .youtube { background: #ff0000; }
+    .youtube:hover { background: #cc0000; box-shadow: 0 0 15px #ff0000; }
 
-    .right .link.youtube:hover  { background: rgba(255,0,0,0.45);   box-shadow: 0 0 22px rgba(255,0,0,0.9);   transform: translateY(-4px); }
+    .telegram { background: #0088cc; }
+    .telegram:hover { background: #006699; box-shadow: 0 0 15px #00aaff; }
 
-    /* фоны сторон (твои изображения) */
-    .left  { background-image: url('https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg'); }
-    .right { background-image: url('https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png'); }
+    /* Эффекты при наведении */
+    .left:hover {
+        flex: 1.2;
+        filter: brightness(1.3);
+        box-shadow: inset 0 0 80px rgba(0,0,255,1);
+    }
 
-    /* затемнение противоположной стороны при hover (чтобы было явнее) */
-    body.left-hover .right::before  { opacity: 0.7; }
-    body.right-hover .left::before  { opacity: 0.7; }
+    .right:hover {
+        flex: 1.2;
+        filter: brightness(1.3);
+        box-shadow: inset 0 0 80px rgba(255,0,0,1);
+    }
 
-    /* мелкая адаптивность */
-    @media (max-width:800px){
-      .avatar{width:140px;height:140px}
-      .link{font-size:18px;padding:12px 22px}
+    /* Глобальное свечение по краям */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        box-shadow: 0 0 60px rgba(255,0,0,0.5), 0 0 60px rgba(0,0,255,0.5) inset;
+        z-index: 9999;
+    }
+
+    /* 📱 Адаптация для телефонов */
+    @media (max-width: 768px) {
+        body {
+            flex-direction: column;
+        }
+
+        .side {
+            width: 100%;
+            height: 50vh;
+        }
+
+        .side:hover {
+            flex: 1;
+        }
     }
 </style>
 </head>
 <body>
+    <div class="side left">
+        <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg" alt="Моя аватарка">
+        <div class="links">
+            <a class="youtube" href="https://youtube.com/@Tverst80">YouTube</a>
+            <a class="telegram" href="https://t.me/Tverst80">Telegram</a>
+        </div>
+    </div>
 
-<div class="side left"
-     onmouseenter="document.body.classList.add('left-hover')"
-     onmouseleave="document.body.classList.remove('left-hover')">
-  <div class="side-content">
-    <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg" class="avatar" alt="Мой аватар">
-    <a class="link telegram" href="https://t.me/Tverst8O" target="_blank" rel="noopener">Telegram</a>
-    <a class="link youtube" href="https://www.youtube.com/@Tverst80" target="_blank" rel="noopener">YouTube</a>
-  </div>
-</div>
-
-<div class="side right"
-     onmouseenter="document.body.classList.add('right-hover')"
-     onmouseleave="document.body.classList.remove('right-hover')">
-  <div class="side-content">
-    <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png" class="avatar" alt="Аватар друга">
-    <a class="link youtube" href="https://www.youtube.com/@tverst50" target="_blank" rel="noopener">YouTube Брата</a>
-  </div>
-</div>
-
+    <div class="side right">
+        <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png" alt="Аватарка друга">
+        <div class="links">
+            <a class="youtube" href="https://youtube.com/@Tverst50">YouTube</a>
+            <a class="telegram" href="https://t.me/Tverst50">Telegram</a>
+        </div>
+    </div>
 </body>
 </html>

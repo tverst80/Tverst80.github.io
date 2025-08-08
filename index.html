@@ -1,1 +1,187 @@
-<!doctype html><html lang="ru"><head>  <meta charset="utf-8">  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  <meta name="viewport" content="width=device-width,initial-scale=1">  <title>Tverst80 &mdash; Links</title>  <style>    :root{      --bg:#07070a;      --panel:#0f1114;      --fg:#e6eef8;      --tg:#0088cc;      --yt:#ff0000;    }    *{box-sizing:border-box}    body{      margin:0;      min-height:100vh;      display:flex;      align-items:center;      justify-content:center;      background:        radial-gradient(circle at 10% 10%, #071226 0%, var(--bg) 40%),        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));      color:var(--fg);      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;      padding:24px;    }    .card{      width:100%;      max-width:540px;      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));      border-radius:16px;      padding:34px;      box-shadow:0 10px 40px rgba(0,0,0,0.6);      text-align:center;    }    h1{      margin:0 0 10px;      font-size:28px;      letter-spacing:0.4px;    }    .subtitle{      margin:0 0 22px;      color:rgba(230,238,248,0.85);      opacity:0.9;      font-size:15px;    }    .links{display:flex;flex-direction:column;gap:12px;align-items:center}    a.btn{      display:flex;      align-items:center;      gap:12px;      width:100%;      max-width:420px;      padding:12px 16px;      border-radius:12px;      text-decoration:none;      color:#fff;      font-weight:700;      box-shadow:0 6px 20px rgba(0,0,0,0.6);      transition:transform .18s ease, box-shadow .18s ease;    }    a.btn .icon{      width:36px;      height:36px;      border-radius:8px;      display:inline-grid;      place-items:center;      font-size:16px;      flex:0 0 36px;      background:rgba(0,0,0,0.08);      backdrop-filter: blur(2px);    }    /* Telegram */    a.btn.telegram{      background: linear-gradient(90deg, #007ab8, #00a8e6);      box-shadow:0 0 12px rgba(0,136,204,0.28), 0 8px 26px rgba(0,0,0,0.6);    }    a.btn.telegram:hover{ transform:translateY(-6px); box-shadow:0 0 26px rgba(0,168,230,0.38), 0 18px 46px rgba(0,0,0,0.6); }    /* YouTube */    a.btn.youtube{      background: linear-gradient(90deg, #ff0000, #ff4d4d);      box-shadow:0 0 12px rgba(255,0,0,0.28), 0 8px 26px rgba(0,0,0,0.6);    }    a.btn.youtube:hover{ transform:translateY(-6px); box-shadow:0 0 28px rgba(255,77,77,0.38), 0 18px 46px rgba(0,0,0,0.6); }    .note{margin-top:18px;font-size:13px;opacity:0.7}    @media (max-width:420px){      .card{padding:20px}      .subtitle{font-size:14px}    }  </style></head><body>  <div class="card">    <h1>&#127775; ��� ������ &#127775;</h1>    <p class="subtitle">����� �� ������, ����� ������� �������</p>    <div class="links">      <a class="btn telegram" href="https://t.me/Tverst8O" target="_blank" rel="noopener noreferrer">        <span class="icon" aria-hidden="true">??</span>        <span>Telegram � @Tverst8O</span>      </a>      <a class="btn youtube" href="https://www.youtube.com/@Tverst80" target="_blank" rel="noopener noreferrer">        <span class="icon" aria-hidden="true">??</span>        <span>YouTube � Tverst80</span>      </a>      <a class="btn youtube" href="https://www.youtube.com/@tverst50" target="_blank" rel="noopener noreferrer">        <span class="icon" aria-hidden="true">??</span>        <span>YouTube � ���� (tverst50)</span>      </a>    </div>    <div class="note">�����: ���� ������ ���� �������� � UTF-8 (��� BOM). ����� ���� ���� � ����������� ��� <code>index.html</code>.</div>  </div></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tverst80 — Links</title>
+<style>
+    :root{
+      --blue: 0,0,255;   /* чистый синий */
+      --red: 255,0,0;    /* чистый красный */
+    }
+
+    *{box-sizing:border-box}
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+        position: relative;
+        background: #000;
+    }
+
+    /* НЕОНОВЫЙ ОДЕРЖИМЫЙ СЛОЙ ВЫШЕ ВСЕГО */
+    body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none; /* ссылки остаются кликабельны */
+        box-shadow: 0 0 0 transparent;
+        transition: box-shadow .28s ease;
+        z-index: 9999; /* поверх всего */
+    }
+
+    /* ЛЕВЫЙ ХОВЕР = СИНИЙ (0,0,255) */
+    body.left-hover::after {
+        box-shadow:
+          inset 30px 0 90px rgba(var(--blue), 0.98),
+          inset -10px 0 60px rgba(0,0,0,0.55),
+          0 0 140px rgba(var(--blue), 0.85);
+        animation: pulse-blue 1.6s infinite alternate;
+    }
+
+    /* ПРАВЫЙ ХОВЕР = КРАСНЫЙ (255,0,0) */
+    body.right-hover::after {
+        box-shadow:
+          inset -30px 0 90px rgba(var(--red), 0.98),
+          inset 10px 0 60px rgba(0,0,0,0.55),
+          0 0 140px rgba(var(--red), 0.85);
+        animation: pulse-red 1.6s infinite alternate;
+    }
+
+    @keyframes pulse-blue {
+      from {
+        box-shadow:
+          inset 20px 0 70px rgba(var(--blue), 0.9),
+          inset -8px 0 40px rgba(0,0,0,0.5),
+          0 0 100px rgba(var(--blue), 0.7);
+      }
+      to {
+        box-shadow:
+          inset 40px 0 120px rgba(var(--blue), 1),
+          inset -12px 0 60px rgba(0,0,0,0.6),
+          0 0 180px rgba(var(--blue), 1);
+      }
+    }
+    @keyframes pulse-red {
+      from {
+        box-shadow:
+          inset -20px 0 70px rgba(var(--red), 0.9),
+          inset 8px 0 40px rgba(0,0,0,0.5),
+          0 0 100px rgba(var(--red), 0.7);
+      }
+      to {
+        box-shadow:
+          inset -40px 0 120px rgba(var(--red), 1),
+          inset 12px 0 60px rgba(0,0,0,0.6),
+          0 0 180px rgba(var(--red), 1);
+      }
+    }
+
+    .side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        position: relative;
+        transition: flex .36s ease, filter .36s ease;
+        z-index: 1; /* под неоновым слоем */
+    }
+
+    .side::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.8));
+        z-index: 1;
+        transition: opacity .36s ease;
+    }
+
+    .side-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    /* увеличение при наведении на сторону */
+    .side:hover { flex: 1.2; filter: brightness(1.05); }
+
+    .avatar {
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.12);
+        margin-bottom: 18px;
+        transition: transform .28s ease, box-shadow .28s ease;
+        z-index: 3;
+    }
+
+    /* Цветовые кайфы аватарок (видны под неоновым слоем, т.к. слой прозрачный) */
+    .left .avatar { box-shadow: 0 0 40px rgba(0,0,255,0.95); }
+    .right .avatar { box-shadow: 0 0 40px rgba(255,0,0,0.95); }
+
+    .side:hover .avatar { transform: scale(1.06); }
+
+    .link {
+        display: block;
+        margin: 14px 0;
+        padding: 16px 34px;
+        border-radius: 14px;
+        font-size: 20px;
+        text-decoration: none;
+        font-weight: 800;
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        transition: background .22s ease, box-shadow .22s ease, transform .22s ease;
+        z-index: 3;
+    }
+
+    /* кнопки по цвету логотипа */
+    .left .link.telegram:hover  { background: rgba(0,136,204,0.45); box-shadow: 0 0 22px rgba(0,136,204,0.9); transform: translateY(-4px); }
+    .left .link.youtube:hover   { background: rgba(255,0,0,0.45);   box-shadow: 0 0 22px rgba(255,0,0,0.9);   transform: translateY(-4px); }
+
+    .right .link.youtube:hover  { background: rgba(255,0,0,0.45);   box-shadow: 0 0 22px rgba(255,0,0,0.9);   transform: translateY(-4px); }
+
+    /* фоны сторон (твои изображения) */
+    .left  { background-image: url('https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg'); }
+    .right { background-image: url('https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png'); }
+
+    /* затемнение противоположной стороны при hover (чтобы было явнее) */
+    body.left-hover .right::before  { opacity: 0.7; }
+    body.right-hover .left::before  { opacity: 0.7; }
+
+    /* мелкая адаптивность */
+    @media (max-width:800px){
+      .avatar{width:140px;height:140px}
+      .link{font-size:18px;padding:12px 22px}
+    }
+</style>
+</head>
+<body>
+
+<div class="side left"
+     onmouseenter="document.body.classList.add('left-hover')"
+     onmouseleave="document.body.classList.remove('left-hover')">
+  <div class="side-content">
+    <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg" class="avatar" alt="Мой аватар">
+    <a class="link telegram" href="https://t.me/Tverst8O" target="_blank" rel="noopener">Telegram</a>
+    <a class="link youtube" href="https://www.youtube.com/@Tverst80" target="_blank" rel="noopener">YouTube</a>
+  </div>
+</div>
+
+<div class="side right"
+     onmouseenter="document.body.classList.add('right-hover')"
+     onmouseleave="document.body.classList.remove('right-hover')">
+  <div class="side-content">
+    <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png" class="avatar" alt="Аватар друга">
+    <a class="link youtube" href="https://www.youtube.com/@tverst50" target="_blank" rel="noopener">YouTube Брата</a>
+  </div>
+</div>
+
+</body>
+</html>

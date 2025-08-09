@@ -11,6 +11,7 @@
         display: flex;
         font-family: Arial, sans-serif;
         background: #000;
+        overflow: hidden;
     }
 
     .side {
@@ -22,6 +23,7 @@
         transition: flex 0.5s ease, filter 0.5s ease;
         position: relative;
         overflow: hidden;
+        z-index: 1;
     }
 
     .left {
@@ -38,7 +40,9 @@
         border-radius: 50%;
         margin-bottom: 20px;
         box-shadow: 0 0 25px rgba(0,0,0,0.8);
-        transition: box-shadow 0.5s ease;
+        transition: all 1s ease;
+        position: relative;
+        z-index: 2;
     }
 
     .links a {
@@ -51,29 +55,44 @@
         font-size: 1.2em;
         text-align: center;
         transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+        z-index: 2;
+        position: relative;
     }
 
-    /* Цвета кнопок */
     .youtube { background: #ff0000; }
     .youtube:hover { background: #cc0000; box-shadow: 0 0 15px #ff0000; }
-
     .telegram { background: #0088cc; }
     .telegram:hover { background: #006699; box-shadow: 0 0 15px #00aaff; }
 
-    /* Эффекты при наведении */
+    .more-btn {
+        background: black;
+        color: lime;
+        border: 2px solid lime;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        margin-top: 15px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        z-index: 2;
+        position: relative;
+    }
+    .more-btn:hover {
+        background: lime;
+        color: black;
+    }
+
     .left:hover {
         flex: 1.2;
         filter: brightness(1.3);
         box-shadow: inset 0 0 80px rgba(0,0,255,1);
     }
-
     .right:hover {
         flex: 1.2;
         filter: brightness(1.3);
         box-shadow: inset 0 0 80px rgba(255,0,0,1);
     }
 
-    /* Глобальное свечение по краям */
     body::before {
         content: "";
         position: fixed;
@@ -83,17 +102,64 @@
         z-index: 9999;
     }
 
-    /* 📱 Адаптация для телефонов */
+    .circle-overlay {
+        position: fixed;
+        width: 100px;
+        height: 100px;
+        background: black;
+        border-radius: 50%;
+        transform: scale(0);
+        transition: transform 0.8s ease-out;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .console-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        color: lime;
+        font-family: monospace;
+        padding: 20px;
+        box-sizing: border-box;
+        font-size: 18px;
+        display: none;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        z-index: 15;
+    }
+
+    /* кнопка назад */
+    .back-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background: #222;
+        color: lime;
+        border: 2px solid lime;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 20;
+        display: none;
+    }
+    .back-btn:hover {
+        background: lime;
+        color: black;
+    }
+
     @media (max-width: 768px) {
         body {
             flex-direction: column;
         }
-
         .side {
             width: 100%;
             height: 50vh;
         }
-
         .side:hover {
             flex: 1;
         }
@@ -104,16 +170,94 @@
     <div class="side left">
         <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst80.jpg" alt="Моя аватарка">
         <div class="links">
-            <a class="youtube" href="https://youtube.com/@Tverst80">YouTube</a>
-            <a class="telegram" href="https://t.me/Tverst80">Telegram</a>
+            <a class="youtube" href="https://youtube.com/@Tverst80" target="_blank">YouTube</a>
+            <a class="telegram" href="https://t.me/Tverst8O" target="_blank">Telegram</a>
         </div>
+        <!-- Добавлен уникальный текст для этой кнопки -->
+        <button class="more-btn" data-side="left" data-text="Илья \n13 Лет \nДевушки Нет \n500+ подписчиков \nЕсть Telegram и YouTube \nДата Рождения: 15:11:2011">Подробнее</button>
     </div>
 
     <div class="side right">
         <img src="https://raw.githubusercontent.com/tverst80/Tverst80.github.io/refs/heads/main/Tverst50.png" alt="Аватарка друга">
         <div class="links">
-            <a class="youtube" href="https://youtube.com/@Tverst50">YouTube</a>
+            <a class="youtube" href="https://youtube.com/@Tverst50" target="_blank">YouTube</a>
         </div>
+        <!-- Добавлен уникальный текст для этой кнопки -->
+        <button class="more-btn" data-side="right" data-text="Макс \n13 Лет \nНет Девушки \n60+ Подписчиков \nTelegram Нет, Есть YouTube \nДата Рождения: 29:6:2012">Подробнее</button>
     </div>
+
+    <div class="circle-overlay"></div>
+    <div class="console-screen" id="consoleScreen"></div>
+    <button class="back-btn" id="backBtn">Назад</button>
+
+<script>
+    const buttons = document.querySelectorAll('.more-btn');
+    const circle = document.querySelector('.circle-overlay');
+    const consoleScreen = document.getElementById('consoleScreen');
+    const backBtn = document.getElementById('backBtn');
+
+    // убрал глобальный testText, теперь каждый btn имеет data-text
+
+    let activeImg = null;
+    let typingInterval = null;
+
+    function startTyping(text) {
+        // останавливаем старую печать если есть
+        if (typingInterval) clearInterval(typingInterval);
+        consoleScreen.textContent = '';
+        let i = 0;
+        typingInterval = setInterval(() => {
+            consoleScreen.textContent += text.charAt(i) || '';
+            i++;
+            if (i > text.length) {
+                clearInterval(typingInterval);
+                typingInterval = null;
+            }
+        }, 40);
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const side = btn.dataset.side;
+            const text = btn.dataset.text || '';
+            const rect = btn.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            circle.style.left = `${x - 50}px`;
+            circle.style.top = `${y - 50}px`;
+            circle.style.transform = 'scale(0)';
+            circle.style.display = 'block';
+
+            setTimeout(() => {
+                circle.style.transform = 'scale(30)';
+            }, 10);
+
+            setTimeout(() => {
+                circle.style.display = 'none';
+                consoleScreen.style.display = 'block';
+                backBtn.style.display = 'block';
+
+                activeImg = document.querySelector(`.${side} img`);
+                if (activeImg) activeImg.style.transform = 'translateY(-150px)';
+
+                startTyping(text.replace(/\\n/g, '\n'));
+            }, 900);
+        });
+    });
+
+    backBtn.addEventListener('click', () => {
+        consoleScreen.style.display = 'none';
+        backBtn.style.display = 'none';
+        if (activeImg) {
+            activeImg.style.transform = 'translateY(0)';
+            activeImg = null;
+        }
+        if (typingInterval) {
+            clearInterval(typingInterval);
+            typingInterval = null;
+        }
+    });
+</script>
 </body>
 </html>

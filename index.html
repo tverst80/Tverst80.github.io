@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tverst Team — Главная</title>
+<style>
+  :root{
+    --bg:#0b0b0c;
+    --text:#e7f6ff;
+    --blue:#339DFF;
+    --red:#FF3355;
+    --yellow:#FFD93D;
+    --pink:#FF66FF;
+    --white:#ffffff;
+    --card-radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system, Arial,-apple-system; -webkit-font-smoothing:antialiased;}
+  a{color:inherit}
+
+/* ====== INTRO (full-screen) ====== */
+  .intro-wrap{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;
+    background:var(--bg);pointer-events:none; /* stable background */
+  }
+  /* slight centered glow behind Monster */
+  .intro-glow{
+    position:absolute;left:50%;top:50%;width:520px;height:520px;transform:translate(-50%,-50%);filter:blur(48px);
+    background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.08), transparent 15%), radial-gradient(circle at 30% 70%, rgba(51,157,255,0.03), transparent 30%), radial-gradient(circle at 70% 30%, rgba(255,51,85,0.02), transparent 30%);
+    opacity:0.95;pointer-events:none;
+  }
+
+  /* nickname visuals */
+  .nick{
+    position:absolute; transform:translate(-50%,-50%); font-weight:800; letter-spacing:1px; white-space:nowrap;
+    font-size:20px; padding:6px 10px; border-radius:8px; pointer-events:none;
+    text-shadow:0 0 18px currentColor, 0 0 36px currentColor;
+    opacity:0;
+  }
+  .n-monster{ color:var(--white); text-shadow:0 0 36px #ffffffaa, 0 0 80px rgba(51,157,255,0.06); font-size:28px; font-weight:900; }
+  .n-t80{ color:var(--blue); }
+  .n-t50{ color:var(--red); }
+  .n-t70{ color:var(--yellow); }
+  .n-ksenia{ color:var(--pink); }
+
+  /* show animation */
+  .nick.show{ opacity:1; transform:translate(-50%,-50%) scale(1); transition: transform .45s cubic-bezier(.2,.9,.2,1), opacity .35s; }
+
+  /* when moving we set inline transform */
+  /* blocks that will be drawn: invisible until draw starts */
+  .svg-block{
+    position:absolute; width:300px; height:180px; left:0; top:0; pointer-events:none; opacity:0;
+  }
+  /* make svg visible when drawing */
+  .svg-block.drawn{ opacity:1; }
+
+  /* final cards (visible after draw) */
+  main{opacity:0; transition:opacity .45s ease; position:relative; z-index:1;}
+
+/* ====== HEADER ====== */
+  header.site-header{
+    position:fixed;left:0;right:0;top:-90px; /* will slide down */
+    background:linear-gradient(90deg, rgba(51,157,255,0.04), rgba(255,51,85,0.03));
+    backdrop-filter: blur(4px); padding:18px 12px; text-align:center; z-index:50;
+    transition: transform .6s cubic-bezier(.2,.9,.2,1), top .4s;
+  }
+  header.site-header.show{ top:0; transform:translateY(0); }
+  header h1{ margin:0; font-size:26px; letter-spacing:1px; }
+  header p{ margin:6px 0 0; color:rgba(231,246,255,0.85); }
+
+/* ====== GRID / CARDS ====== */
+  .container{ max-width:1200px; margin:120px auto 40px; padding:20px; }
+
+  .row-top{ display:grid; grid-template-columns:repeat(3,1fr); gap:28px; align-items:start; }
+  .row-bottom{ display:grid; grid-template-columns:repeat(2,1fr); gap:28px; margin-top:28px; justify-content:center; max-width:760px; margin-left:auto; margin-right:auto; }
+
+  .card{
+    position:relative;
+    min-height:220px;
+    border-radius:var(--card-radius);
+    background:rgba(255,255,255,0.02);
+    border:2px solid rgba(255,255,255,0.03);
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    padding:18px; text-align:center; overflow:hidden;
+    opacity:0; transform:translateY(8px); transition: all .45s ease;
+  }
+  .card.show{ opacity:1; transform:none; }
+  .card .avatar{ width:110px; height:110px; border-radius:12px; object-fit:cover; margin:0 auto 10px; border:4px solid rgba(255,255,255,0.06); }
+  .card .title{ font-weight:800; margin:6px 0; }
+  .card .desc{ min-height:48px; color:rgba(231,246,255,0.9); margin:8px 0; font-size:14px; }
+  .card .stats{ color:rgba(231,246,255,0.8); margin:6px 0; }
+  .card .buttons{ display:flex; gap:10px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
+  .btn{ padding:8px 14px; border-radius:12px; font-weight:700; text-decoration:none; display:inline-block; color:#000; }
+  .btn.blue{ background:var(--blue); box-shadow:0 0 18px rgba(51,157,255,0.12); }
+  .btn.red{ background:var(--red); box-shadow:0 0 18px rgba(255,51,85,0.12); color:#fff; }
+  .btn.white{ background:#fff; color:#000; box-shadow:0 0 18px rgba(255,255,255,0.12); }
+  .btn.yellow{ background:var(--yellow); color:#000; box-shadow:0 0 18px rgba(255,217,61,0.12); }
+  .btn.pink{ background:var(--pink); color:#000; box-shadow:0 0 18px rgba(255,102,255,0.12); }
+  .btn.telegram{ background:#0088cc; color:#fff; box-shadow:0 0 18px rgba(0,136,204,0.12); }
+
+  /* neon outline classes for subtle breathing after draw */
+  .outline-blue{ box-shadow:0 0 28px rgba(51,157,255,0.12), inset 0 0 30px rgba(51,157,255,0.02); border-color:rgba(51,157,255,0.18); }
+  .outline-red{ box-shadow:0 0 28px rgba(255,51,85,0.12), inset 0 0 30px rgba(255,51,85,0.02); border-color:rgba(255,51,85,0.18); }
+  .outline-white{ box-shadow:0 0 28px rgba(255,255,255,0.12), inset 0 0 30px rgba(255,255,255,0.02); border-color:rgba(255,255,255,0.18); }
+  .outline-yellow{ box-shadow:0 0 28px rgba(255,217,61,0.12), inset 0 0 30px rgba(255,217,61,0.02); border-color:rgba(255,217,61,0.18); }
+  .outline-pink{ box-shadow:0 0 28px rgba(255,102,255,0.12), inset 0 0 30px rgba(255,102,255,0.02); border-color:rgba(255,102,255,0.18); }
+
+  /* Footer (squad) slides from bottom */
+  footer.site-footer{ position:fixed; left:0; right:0; bottom:-140px; background:rgba(0,0,0,0.2); padding:18px; transition:bottom .6s cubic-bezier(.2,.9,.2,1); z-index:40; }
+  footer.site-footer.show{ bottom:0; }
+  .squad-row{ max-width:1100px; margin:0 auto; display:flex; gap:12px; align-items:center; justify-content:center; }
+  .squad-row img{ width:64px; height:64px; border-radius:12px; object-fit:cover; }
+  .squad-row .squad-text{ max-width:760px; color:rgba(231,246,255,0.88); }
+  .copyright{ margin-left:auto; color:rgba(231,246,255,0.65); }
+
+  /* typing cursor style applied dynamically */
+  .typing{ border-right:2px solid rgba(255,255,255,0.7); padding-right:6px; animation:blink .9s steps(1) infinite; }
+  @keyframes blink{ 50%{ border-color:transparent } }
+
+  /* responsive */
+  @media (max-width:980px){
+    .row-top{ grid-template-columns:repeat(2,1fr) }
+    .row-bottom{ grid-template-columns:repeat(2,1fr) }
+    .container{ margin-top:120px }
+  }
+  @media (max-width:640px){
+    header h1{ font-size:20px }
+    .row-top{ grid-template-columns:1fr;}
+    .row-bottom{ grid-template-columns:1fr; }
+    .card{ min-height:200px }
+  }
+</style>
+</head>
+<body>
+
+<!-- INTRO (same document) -->
+<div class="intro-wrap" id="intro">
+  <div class="intro-glow"></div>
+
+  <!-- nick elements (they will move and be centers of blocks) -->
+  <div class="nick n-monster" id="nick-monster">Monster_tv</div>
+  <div class="nick n-t80" id="nick-t80">Tverst80</div>
+  <div class="nick n-t50" id="nick-t50">Tverst50</div>
+  <div class="nick n-t70" id="nick-t70">Tverst70</div>
+  <div class="nick n-ksenia" id="nick-ksenia">Ksenia_Mix</div>
+
+  <!-- SVG outlines for blocks (positioned to cover where blocks will be drawn) -->
+  <!-- We'll use <rect> per block and animate stroke-dashoffset to create "drawing" effect -->
+  <svg class="svg-block" id="svg-t80" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="3" y="3" width="294" height="174" rx="12" ry="12" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="svg-block" id="svg-t50" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="3" y="3" width="294" height="174" rx="12" ry="12" fill="none" stroke="var(--red)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="svg-block" id="svg-monster" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="3" y="3" width="294" height="174" rx="12" ry="12" fill="none" stroke="var(--white)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="svg-block" id="svg-t70" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="3" y="3" width="294" height="174" rx="12" ry="12" fill="none" stroke="var(--yellow)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="svg-block" id="svg-ksenia" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="3" y="3" width="294" height="174" rx="12" ry="12" fill="none" stroke="var(--pink)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<!-- HEADER (slides down) -->
+<header class="site-header" id="site-header">
+  <h1>Tverst Team</h1>
+  <p>Неоновые создатели — идеи, видео и сквад.</p>
+</header>
+
+<!-- MAIN content (cards) -->
+<style>
+  .container {
+    padding-bottom: 120px; /* чтобы нижний блок не перекрывался */
+  }
+</style>
+<main id="main">
+  <div class="container">
+    <section class="row-top">
+      <!-- Card Tverst80 -->
+      <div class="card outline-blue" id="card-t80">
+        <img src="Tverst80.png" class="avatar" alt="Tverst80">
+        <div class="title" style="color:var(--blue)">Tverst80</div>
+        <div class="desc" id="desc-t80"><!-- ОПИСАНИЕ: вставьте текст здесь или запишите в data-text --> </div>
+        <div class="stats" id="stats-t80">579 подписчиков • 174 видео</div>
+        <div class="buttons">
+          <!-- ссылки: добавьте hrefs -->
+          <a class="btn blue" id="link-t80" href="https://www.youtube.com/@Tverst80" target="_blank">Канал</a>
+          <a class="btn blue" id="last-t80" href="https://www.youtube.com/watch?v=9LJJyxLmjeQ&t=6s" target="_blank">Последнее видео</a>
+          <a class="btn telegram" id="tg-t80" href="t.me/Tverst80" target="_blank">Telegram</a>
+        </div>
+      </div>
+
+      <!-- Card Tverst50 -->
+      <div class="card outline-red" id="card-t50">
+        <img src="Tverst50.png" class="avatar" alt="Tverst50">
+        <div class="title" style="color:var(--red)">Tverst50</div>
+        <div class="desc" id="desc-t50"><!-- ОПИСАНИЕ --> </div>
+        <div class="stats" id="stats-t50">98 Подписчиков • 93 Видео</div>
+        <div class="buttons">
+          <a class="btn red" id="link-t50" href="https://www.youtube.com/@tverst50" target="_blank">Канал</a>
+          <a class="btn red" id="last-t50" href="www.youtube.com/watch?v=2cync2msbk8&t" target="_blank">Последнее видео</a>
+        </div>
+      </div>
+
+      <!-- Card Monster (center) -->
+      <div class="card outline-white" id="card-monster">
+        <img src="monster.png" class="avatar" alt="Monster_tv">
+        <div class="title" style="color:var(--white)">Monster_tv</div>
+        <div class="desc" id="desc-monster"><!-- ОПИСАНИЕ --> </div>
+        <div class="stats" id="stats-monster">39 Подписчиков • 24 Видео</div>
+        <div class="buttons">
+          <a class="btn white" id="link-monster" href="https://www.youtube.com/@MONSTERS_tv" target="_blank">Канал</a>
+          <a class="btn white" id="last-monster" href="https://www.youtube.com/shorts/VS5_iLbTMxI" target="_blank">Последнее видео</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="row-bottom">
+      <div class="card outline-yellow" id="card-t70">
+        <img src="tverst70.png" class="avatar" alt="Tverst70">
+        <div class="title" style="color:var(--yellow)">Tverst70</div>
+        <div class="desc" id="desc-t70"><!-- ОПИСАНИЕ --> </div>
+        <div class="stats" id="stats-t70">74 Подписчиков • 30 Видео</div>
+        <div class="buttons">
+          <a class="btn yellow" id="link-t70" href="https://www.youtube.com/@tverst70" target="_blank">Канал</a>
+          <a class="btn yellow" id="last-t70" href="https://www.youtube.com/watch?v=pmvxnVT5YVY" target="_blank">Последнее видео</a>
+        </div>
+      </div>
+
+      <div class="card outline-pink" id="card-ksenia">
+        <img src="ksenia.png" class="avatar" alt="Ksenia_Mix">
+        <div class="title" style="color:var(--pink)">Ksenia_Mix</div>
+        <div class="desc" id="desc-ksenia"><!-- ОПИСАНИЕ --> </div>
+        <div class="stats" id="stats-ksenia">29 Подписчиков • 210 Видео</div>
+        <div class="buttons">
+          <a class="btn pink" id="link-ksenia" href="https://www.youtube.com/@Ксения-Тока55" target="_blank">Канал</a>
+          <a class="btn pink" id="last-ksenia" href="https://www.youtube.com/shorts/8SI1KiOLVFw" target="_blank">Последнее видео</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Footer / Squad -->
+<footer class="site-footer" id="site-footer">
+  <div class="squad-row">
+    <img src="squad.png" alt="Squad">
+    <div class="squad-text">Наш совместный сквад — место вдохновения, идей и общения. Просто пространство для креатива и без негатива.</div>
+    <div class="copyright">© 2025 Tverst Team. Все права защищены. Кто сворует тот Гей</div>
+  </div>
+</footer>
+
+<script>
+/*
+ Timeline (5s total roughly):
+ 0.0s - 1.5s: Monster appears center
+ 1.5s - 2.5s: other nicks appear layered behind (small scale-in)
+ 2.5s - 3.0s: all nicks move to final positions (centers of future blocks)
+ 3.0s - 4.0s: simultaneously animate SVG rect strokes (4s draw)
+ 4.0s - 5.0s: reveal cards, show buttons, start simultaneous typing animations, header slides down, footer slides up
+*/
+
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  const intro = document.getElementById('intro');
+  const siteHeader = document.getElementById('site-header');
+  const siteFooter = document.getElementById('site-footer');
+  const main = document.getElementById('main');
+
+  // nick elements
+  const nickMonster = document.getElementById('nick-monster');
+  const nickT80 = document.getElementById('nick-t80');
+  const nickT50 = document.getElementById('nick-t50');
+  const nickT70 = document.getElementById('nick-t70');
+  const nickKsenia = document.getElementById('nick-ksenia');
+
+  // svg elements (rect)
+  const svgT80 = document.getElementById('svg-t80');
+  const svgT50 = document.getElementById('svg-t50');
+  const svgMonster = document.getElementById('svg-monster');
+  const svgT70 = document.getElementById('svg-t70');
+  const svgKsenia = document.getElementById('svg-ksenia');
+
+  // cards
+  const cardT80 = document.getElementById('card-t80');
+  const cardT50 = document.getElementById('card-t50');
+  const cardMonster = document.getElementById('card-monster');
+  const cardT70 = document.getElementById('card-t70');
+  const cardKsenia = document.getElementById('card-ksenia');
+
+  // map blocks to nicks and svgs
+  const items = [
+    { nick: nickT80, svg: svgT80, card: cardT80 },
+    { nick: nickT50, svg: svgT50, card: cardT50 },
+    { nick: nickMonster, svg: svgMonster, card: cardMonster },
+    { nick: nickT70, svg: svgT70, card: cardT70 },
+    { nick: nickKsenia, svg: svgKsenia, card: cardKsenia },
+  ];
+
+  // function: place nick initially centered stacked (Monster center)
+  function placeInitial(){
+    const cx = window.innerWidth/2;
+    const cy = window.innerHeight/2;
+    // center Monster
+    nickMonster.style.left = (cx) + 'px';
+    nickMonster.style.top = (cy - 10) + 'px';
+    nickMonster.style.transform = 'translate(-50%,-50%) scale(0.95)';
+    nickMonster.classList.add('show');
+
+    // other nicks slightly behind center (will animate in)
+    const offset = 10;
+    nickT80.style.left = cx + 'px';
+    nickT80.style.top = (cy + offset) + 'px';
+    nickT80.style.transform = 'translate(-50%,-50%) scale(0.6)';
+
+    nickT50.style.left = cx + 'px';
+    nickT50.style.top = (cy + offset) + 'px';
+    nickT50.style.transform = 'translate(-50%,-50%) scale(0.6)';
+
+    nickT70.style.left = cx + 'px';
+    nickT70.style.top = (cy + offset) + 'px';
+    nickT70.style.transform = 'translate(-50%,-50%) scale(0.6)';
+
+    nickKsenia.style.left = cx + 'px';
+    nickKsenia.style.top = (cy + offset) + 'px';
+    nickKsenia.style.transform = 'translate(-50%,-50%) scale(0.6)';
+  }
+
+  // function: compute final centers (centers of card positions)
+  function computeCardCenters(){
+    const map = {};
+    const r80 = cardT80.getBoundingClientRect();
+    map.t80 = { x: r80.left + r80.width/2, y: r80.top + r80.height/2 };
+
+    const r50 = cardT50.getBoundingClientRect();
+    map.t50 = { x: r50.left + r50.width/2, y: r50.top + r50.height/2 };
+
+    const rmon = cardMonster.getBoundingClientRect();
+    map.mon = { x: rmon.left + rmon.width/2, y: rmon.top + rmon.height/2 };
+
+    const r70 = cardT70.getBoundingClientRect();
+    map.t70 = { x: r70.left + r70.width/2, y: r70.top + r70.height/2 };
+
+    const rks = cardKsenia.getBoundingClientRect();
+    map.ks = { x: rks.left + rks.width/2, y: rks.top + rks.height/2 };
+
+    return map;
+  }
+
+  // function: position SVG around card center
+  function placeSVG(svgEl, center){
+    const w = 300, h = 180;
+    // position so rect encloses similar layout to card
+    // card center is center; svg's top-left should be center - w/2, center - h/2
+    svgEl.style.left = (center.x - w/2) + 'px';
+    svgEl.style.top = (center.y - h/2) + 'px';
+  }
+
+  // prepare: ensure cards exist in DOM (they are, but hidden)
+  // placeInitial first
+  placeInitial();
+
+  // step timings (ms)
+  const t0 = 0;
+  const t_monster_show = 200;       // Monster appears
+  const t_others_show = 1500;       // other nicks scale in
+  const t_move_start = 2500;        // move to positions
+  const t_draw_start = 3000;        // draw outlines (4s)
+  const t_draw_duration = 4000;     // 4 seconds draw
+  const t_reveal = t_draw_start + t_draw_duration; // reveal cards and UI
+  const t_total = t_reveal + 1000;  // end of transition
+
+  // show other nicks near center
+  setTimeout(()=>{
+    [nickT80, nickT50, nickT70, nickKsenia].forEach(n=>{
+      n.classList.add('show');
+      n.style.transform = 'translate(-50%,-50%) scale(0.95)';
+    });
+  }, t_others_show);
+
+  // before moving, we must ensure layout computed; reveal cards briefly hidden but exist
+  // compute centers after small delay to ensure layout (cards are present, but opacity 0)
+  setTimeout(()=>{
+    const centers = computeCardCenters();
+
+    // move each nick to corresponding card center
+    const moves = [
+      {nick:nickT80, center:centers.t80},
+      {nick:nickT50, center:centers.t50},
+      {nick:nickMonster, center:centers.mon},
+      {nick:nickT70, center:centers.t70},
+      {nick:nickKsenia, center:centers.ks},
+    ];
+
+    // move start
+    setTimeout(()=>{
+      moves.forEach(m=>{
+        // move by setting left/top to target center
+        m.nick.style.left = (m.center.x) + 'px';
+        m.nick.style.top = (m.center.y - 10) + 'px'; // a bit upper to center inside block
+        m.nick.style.transform = 'translate(-50%,-50%) scale(1)';
+      });
+    }, t_move_start - (Date.now()?0:0));
+
+    // place SVG outlines at same positions (so draw occurs around nick)
+    setTimeout(()=>{
+      placeSVG(svgT80, centers.t80);
+      placeSVG(svgT50, centers.t50);
+      placeSVG(svgMonster, centers.mon);
+      placeSVG(svgT70, centers.t70);
+      placeSVG(svgKsenia, centers.ks);
+
+      // make SVG elements visible and prepare stroke-dasharray for drawing
+      [svgT80, svgT50, svgMonster, svgT70, svgKsenia].forEach(s=>{
+        s.classList.add('drawn');
+        const rect = s.querySelector('rect');
+        const length = 2*(rect.getAttribute('width')*1 + rect.getAttribute('height')*1);
+        // set stroke dash properties
+        rect.style.strokeDasharray = length;
+        rect.style.strokeDashoffset = length;
+        // add glow (via filter using shadowing effect) by cloning stroke as blurred - simple approach using filter not supported in all; we rely CSS box-shadow on card after reveal
+      });
+
+    }, t_move_start + 50);
+
+    // start drawing (animate strokeDashoffset to 0 over t_draw_duration)
+    setTimeout(()=>{
+      [svgT80, svgT50, svgMonster, svgT70, svgKsenia].forEach(s=>{
+        const rect = s.querySelector('rect');
+        // animate via requestAnimationFrame for consistent timing
+        const total = t_draw_duration;
+        const start = performance.now();
+        const startOffset = rect.style.strokeDashoffset * 1;
+        function step(now){
+          const elapsed = now - start;
+          const progress = Math.min(1, elapsed/total);
+          rect.style.strokeDashoffset = startOffset * (1 - progress);
+          // optional: add neon blur by setting filter / opacity - left simple
+          if(progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }, t_draw_start);
+
+    // when draw complete -> reveal cards, show header/footer, start typing
+    setTimeout(()=>{
+      // reveal cards simultaneously
+      [cardT80, cardT50, cardMonster, cardT70, cardKsenia].forEach(c=>{
+        c.classList.add('show');
+      });
+      // add outline breathing classes (subtle)
+      cardT80.classList.add('outline-blue');
+      cardT50.classList.add('outline-red');
+      cardMonster.classList.add('outline-white');
+      cardT70.classList.add('outline-yellow');
+      cardKsenia.classList.add('outline-pink');
+
+      // show header and footer
+      siteHeader.classList.add('show');
+      siteFooter.classList.add('show');
+
+      // fade intro away (remove from DOM) after short delay to allow seeing final positions
+      setTimeout(()=>{
+        const introEl = document.getElementById('intro');
+        if(introEl){
+          introEl.style.transition = 'opacity .6s ease';
+          introEl.style.opacity = '0';
+          setTimeout(()=>{ introEl.remove(); }, 650);
+        }
+        // reveal main content
+        main.style.opacity = '1';
+      }, 350);
+
+      // simultaneously start typing in all descriptions
+      startTypingAll();
+
+    }, t_reveal + 50);
+
+  }, 600); // give a tiny time for layout
+
+  // typing: since you wanted placeholders, elements currently empty.
+  // We will type any text present in data-text attribute; user can fill data-text or innerHTML
+  function typeText(el, text, speed=18){
+    el.textContent = '';
+    el.classList.add('typing');
+    return new Promise(res=>{
+      let i=0;
+      const t = setInterval(()=>{
+        el.textContent += text.charAt(i);
+        i++;
+        if(i >= text.length){ clearInterval(t); el.classList.remove('typing'); res(); }
+      }, speed);
+    });
+  }
+
+  async function startTypingAll(){
+    // each desc element: if it contains data-text attribute, use it; else leave as comment placeholder
+    const descs = [
+      {el:document.getElementById('desc-t80'), text: document.getElementById('desc-t80').getAttribute('data-text') || 'Создатель видео по Minecraft, Geometry Dash и Эдитов. Любит синий неон и сложные конструкции.' },
+      {el:document.getElementById('desc-t50'), text: document.getElementById('desc-t50').getAttribute('data-text') || 'Геймер и Аниматор, делает яркие видео и совместные проекты с Tverst80, Tverst30, Spu7nix и Monster_tv. Любит красные оттенки и мощный стиль.' },
+      {el:document.getElementById('desc-monster'), text: document.getElementById('desc-monster').getAttribute('data-text') || 'Снимаю что-то и буду это делать пока не надоест.' },
+      {el:document.getElementById('desc-t70'), text: document.getElementById('desc-t70').getAttribute('data-text') || 'спасибо что зашёл! жду тебя ещё' },
+      {el:document.getElementById('desc-ksenia'), text: document.getElementById('desc-ksenia').getAttribute('data-text') || 'Снимаю Toca Boca, Танцы под музыку и просто люблю вас!' },
+    ];
+    // type simultaneously: start all promises without awaiting so they run in parallel
+    const promises = descs.map(d=> typeText(d.el, d.text, 20));
+    await Promise.all(promises);
+    // after typing, you may put stats text manually (we leave placeholders)
+    // Example: document.getElementById('stats-t80').textContent = '579 подписчиков • 174 видео';
+  }
+
+  // window resize: (optional) reposition svgs and nick if layout changes before draw
+  window.addEventListener('resize', ()=>{
+    // if intro still present and we have cards, update svg positions
+    if(document.getElementById('svg-t80')){
+      const centers = computeCardCenters();
+      placeSVG(svgT80, centers.t80);
+      placeSVG(svgT50, centers.t50);
+      placeSVG(svgMonster, centers.mon);
+      placeSVG(svgT70, centers.t70);
+      placeSVG(svgKsenia, centers.ks);
+    }
+  });
+
+}); // DOMContentLoaded
+</script>
+</body>
+</html>
